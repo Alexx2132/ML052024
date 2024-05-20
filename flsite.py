@@ -139,5 +139,37 @@ def f_lab4():
                                precision=f'Precision: {precision:.2f}',
                                recall=f'Recall: {recall:.2f}')
 
+
+@app.route('/api', methods=['GET'])
+def get_classification():
+    with open('C:/projects/Project10/model/Dtree.bin', 'rb') as f:
+        data = pickle.load(f)
+        model = data['model']
+        accuracy = data['accuracy']
+        precision = data['precision']
+        recall = data['recall']
+
+    desks = request.args.get('desks')
+    chairs = request.args.get('chairs')
+
+    if desks is None or chairs is None:
+        return jsonify({'error': 'Не введено количество стульев или парт.'}), 400
+
+    try:
+        X_new = np.array([[float(desks), float(chairs)]])
+        pred = model.predict(X_new)
+        class_type = 'лекционная' if pred[0] == 0 else 'практическая'
+
+        return jsonify({
+            'class_model': class_type,
+            'accuracy': accuracy,
+            'precision': precision,
+            'recall': recall
+        })
+    except ValueError:
+        return jsonify({'error': 'Неверные входные данные. Пожалуйста, укажите числовые значения для столов и стульев.'}), 400
+
+
 if __name__ == "__main__":
     app.run(debug=True)
+
