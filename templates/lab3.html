@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<p>Определение размера обуви по росту, весу и полу человека</p>
+<form action="/p_lab3" method="POST">
+    <p><input type="text" class="form_text" name="height"> Рост (см)</p>
+    <p><input name="weight" class="form_text" type="text"> Вес (кг)</p>
+    <p>
+        <label for="gender">Пол:</label>
+        <select name="gender" class="form_text">
+            <option value="0">Женский</option>
+            <option value="1">Мужской</option>
+        </select>
+    </p>
+    <input type="submit" class="form_btn" value="Узнать размер обуви">
+    <h1>{{class_model}}</h1>
+    <h2>Метрики качества:</h2>
+    <p>{{mse}}</p>
+    <p>{{mae}}</p>
+    <p>{{r2}}</p>
+</form>
+{% endblock %}

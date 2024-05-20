@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<h2>Определение типа аудитории по количеству парт и стульев</h2>
+<form action="/p_lab4" method="POST">
+    <p><input type="text" class="form_text" name="desks"> Количество парт</p>
+    <p><input name="chairs" class="form_text" type="text"> Количество стульев</p>
+    <input type="submit" class="form_btn" value="Узнать тип аудитории">
+    <h1>{{class_model}}</h1>
+    <h2>Метрики качества:</h2>
+    <p>{{accuracy}}</p>
+    <p>{{precision}}</p>
+    <p>{{recall}}</p>
+</form>
+{% endblock %}
