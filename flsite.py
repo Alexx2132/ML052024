@@ -2,18 +2,23 @@ import pickle
 
 import numpy as np
 from flask import Flask, render_template, url_for, request, jsonify
+from model.neuron import SingleNeuron
 import pandas as pd
 from sklearn.metrics import recall_score, precision_score, accuracy_score
+
+
 
 app = Flask(__name__)
 
 menu = [{"name": "kNN", "url": "p_knn"},
         {"name": "Логистическая регрессия", "url": "p_lab2"},
         {"name": "Линейная регрессия", "url": "p_lab3"},
-        {"name": "Дерево решений", "url": "p_lab4"}]
+        {"name": "Дерево решений", "url": "p_lab4"},
+        {"name": "neuron", "url": "p_lab5"}]
 
 loaded_model_knn = pickle.load(open('C:/projects/Project10/model/knn.bin', 'rb'))
-
+new_neuron = SingleNeuron(input_size=3)
+new_neuron.load_weights('C:/projects/Project10/model/neuron_weights.txt')
 @app.route("/")
 def index():
     return render_template('index.html', title="Лабораторные работы, выполненные Мишиным А.М.", menu=menu)
@@ -139,6 +144,26 @@ def f_lab4():
                                precision=f'Precision: {precision:.2f}',
                                recall=f'Recall: {recall:.2f}')
 
+
+@app.route("/p_lab5", methods=['POST', 'GET'])
+def p_lab5():
+    if request.method == 'GET':
+        return render_template('neuron.html', title="Первый нейрон", menu=menu, class_model='')
+    if request.method == 'POST':
+        try:
+            input_features = np.array([[float(request.form['diameter']),
+                                        float(request.form['leaf_diameter']),
+                                        float(request.form['height'])]])
+        except ValueError:
+            return render_template('neuron.html', title="Первый нейрон", menu=menu, class_model='Ошибка в данных')
+
+        # Получение предсказаний от модели
+        predictions = new_neuron.forward(input_features)
+        class_name = np.where(predictions >= 0.5, 'Высшие растения', 'Низшие растения')[0]
+        print("Предсказанные значения:", predictions, class_name)
+
+        return render_template('neuron.html', title="Первый нейрон", menu=menu,
+                               class_model="Это: " + class_name)
 
 @app.route('/api', methods=['GET'])
 def get_classification():

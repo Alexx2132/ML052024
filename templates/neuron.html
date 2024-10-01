@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<p>Нейрон для классификации растений</p>
+
+
+<form action="/p_lab5" method="POST">
+    <p><input type="text" class="form_text" name="diameter" placeholder="Диаметр ствола" value="{{ request.form.diameter }}"></p>
+    <p><input name="leaf_diameter" class="form_text" type="text" placeholder="Диаметр листьев" value="{{ request.form.leaf_diameter }}"></p>
+    <p><input name="height" class="form_text" type="text" placeholder="Высота растения" value="{{ request.form.height }}"></p>
+    <input type="submit" class="form_btn" value="Определить тип растения">
+    <h1>{{ class_model }}</h1>
+</form>
+{% endblock %}
