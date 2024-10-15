@@ -1,5 +1,6 @@
 import pickle
 
+import tensorflow as tf
 import numpy as np
 from flask import Flask, render_template, url_for, request, jsonify
 from model.neuron import SingleNeuron
@@ -19,6 +20,7 @@ menu = [{"name": "kNN", "url": "p_knn"},
 loaded_model_knn = pickle.load(open('C:/projects/Project10/model/knn.bin', 'rb'))
 new_neuron = SingleNeuron(input_size=3)
 new_neuron.load_weights('C:/projects/Project10/model/neuron_weights.txt')
+model_sum_squared = tf.keras.models.load_model('C:/projects/Project10/model/model_sum_squared.h5')
 @app.route("/")
 def index():
     return render_template('index.html', title="Лабораторные работы, выполненные Мишиным А.М.", menu=menu)
@@ -194,6 +196,31 @@ def get_classification():
     except ValueError:
         return jsonify({'error': 'Неверные входные данные. Пожалуйста, укажите числовые значения для столов и стульев.'}), 400
 
+
+@app.route('/api_reg', methods=['GET'])
+def predict_sum_squared():
+    try:
+        # Получение данных из запроса, три параметра (например, http://localhost:5000/api_sum_squared?p1=0.2&p2=0.5&p3=0.7)
+        p1 = float(request.args.get('p1'))
+        p2 = float(request.args.get('p2'))
+        p3 = float(request.args.get('p3'))
+
+        # Формируем входной массив из трех значений
+        input_data = np.array([[p1, p2, p3]])
+
+        # Выполнение предсказания
+        predictions = model_sum_squared.predict(input_data)
+
+        # Формирование ответа
+        response = {
+            'sum': str(predictions[0][0]),
+            'sum_squared': str(predictions[0][1])
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
     app.run(debug=True)
