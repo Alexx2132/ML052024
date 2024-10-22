@@ -1,11 +1,15 @@
 import pickle
 
 import tensorflow as tf
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
 import numpy as np
 from flask import Flask, render_template, url_for, request, jsonify
 from model.neuron import SingleNeuron
 import pandas as pd
+import os
 from sklearn.metrics import recall_score, precision_score, accuracy_score
+
 
 
 
@@ -15,12 +19,17 @@ menu = [{"name": "kNN", "url": "p_knn"},
         {"name": "Логистическая регрессия", "url": "p_lab2"},
         {"name": "Линейная регрессия", "url": "p_lab3"},
         {"name": "Дерево решений", "url": "p_lab4"},
-        {"name": "neuron", "url": "p_lab5"}]
+        {"name": "neuron", "url": "p_lab5"},
+        {"name": "Fashion", "url": "p_lab6"}]
 
 loaded_model_knn = pickle.load(open('C:/projects/Project10/model/knn.bin', 'rb'))
 new_neuron = SingleNeuron(input_size=3)
 new_neuron.load_weights('C:/projects/Project10/model/neuron_weights.txt')
 model_sum_squared = tf.keras.models.load_model('C:/projects/Project10/model/model_sum_squared.h5')
+model = load_model('C:/projects/Project10/model/fashion_mnist_model.h5')
+
+class_names = ['Футболка', 'Брюки', 'Пуловер', 'Платье', 'Куртка',
+               'Сандалии', 'Рубашка', 'Кроссовки', 'Сумка', 'Ботинки']
 @app.route("/")
 def index():
     return render_template('index.html', title="Лабораторные работы, выполненные Мишиным А.М.", menu=menu)
@@ -167,6 +176,35 @@ def p_lab5():
         return render_template('neuron.html', title="Первый нейрон", menu=menu,
                                class_model="Это: " + class_name)
 
+
+@app.route('/p_lab6', methods=['GET', 'POST'])
+def p_lab6():
+    if request.method == 'GET':
+        return render_template('lab6.html', title="Сеть для распознавания одежды", menu=menu)
+    if request.method == 'POST':
+        # Проверка на наличие файла в запросе
+        if 'file' not in request.files:
+            return "No file part"
+        file = request.files['file']
+        if file.filename == '':
+            return "No selected file"
+        if file:
+            # Сохранение файла на сервере
+            filepath = os.path.join('C:/projects/Project10/uploads', file.filename)
+            file.save(filepath)
+
+            # Предсказание
+            img = image.load_img(filepath, target_size=(28, 28), color_mode="grayscale")
+            img_array = image.img_to_array(img) / 255.0
+            img_array = np.expand_dims(img_array, axis=0)
+
+            predictions = model.predict(img_array)
+            predicted_class = class_names[np.argmax(predictions)]
+
+            return render_template('lab6.html', title="Сеть для распознавания одежды", menu=menu,
+                                   class_model=predicted_class)
+
+
 @app.route('/api', methods=['GET'])
 def get_classification():
     with open('C:/projects/Project10/model/Dtree.bin', 'rb') as f:
@@ -221,6 +259,7 @@ def predict_sum_squared():
 
     except Exception as e:
         return jsonify({'error': str(e)})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
