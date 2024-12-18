@@ -4,13 +4,20 @@
 {{ super() }}
 </head>
 <body>
-  <h2>Загрузите изображение для распознавания одежды</h2>
+  <h2>Загрузите изображение для классификации мебели</h2>
   <form action="/p_lab6" method="post" enctype="multipart/form-data">
     <input type="file" name="file" accept="image/*">
     <input type="submit" value="Распознать">
   </form>
-    {% if class_model %}
-        <h1>Это: {{ class_model }}</h1>
-    {% endif %}
+
+   {% for cat, msg in get_flashed_messages(True) %}
+      {% if cat == "error" %}
+        <h2 class="err">{{ msg }}</h2>
+      {% endif %}
+  {% endfor %}
+
+  {% if class_model %}
+      <h3>На данном изображении: {{ class_model }}</h3>
+  {% endif %}
 </body>
 {% endblock %}

@@ -59,3 +59,22 @@ form {
   background-color: #f6f6f6; /*Цвет текстового поля*/
   border-radius: 10px 10px 10px 10px; /*Закругляем уголки*/
 }
+
+.image-container {
+    max-width: 800px; /* Ограничение ширины для контейнера */
+    margin: 0 auto; /* Центрируем контейнер по горизонтали */
+    text-align: left; /* Выравниваем содержимое */
+}
+
+.image-preview {
+    max-width: 100%; /* Изображение не может выйти за пределы контейнера */
+    max-height: 600px; /* Ограничиваем высоту */
+    height: auto; /* Сохраняем пропорции */
+    width: auto; /* Убираем фиксированную ширину */
+    display: block; /* Убираем возможные лишние отступы */
+}
+
+.err {
+	color: #CC0000;
+	text-decoration: none;
+}
